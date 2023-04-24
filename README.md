@@ -25,36 +25,48 @@ repeating the process until there is only one node left in the list, this node i
 Below you can see the code for this algorithm and a visual representation of the Huffman Tree.
 
 ```java
-/**
- * Takes the frequency distribution map and creates a binary tree where the lower the 
- * frequency of a character, the deeper it will be in the tree. 
- * 
- * @param frequencyDistribution map containing characters as keys and their frequencies as values
- * @return root node of the huffman tree
- */
-public BTNode<Integer, String> huffman_tree(Map<Character, Integer> frequencyDistribution) {
-	SortedList<BTNode<Integer, String>> sortedList = generateFDSortedList(frequencyDistribution);
-	
-	while (sortedList.size() > 1) { // iterates until only one node remains in the list, this will be our root node
-		// removes the two smallest nodes in the tree
-		BTNode<Integer, String> a = sortedList.removeIndex(0); 
-		BTNode<Integer, String> b = sortedList.removeIndex(0);
-		
-		// create a new node that has a frequency equal to a + b and a symbol equal to a + b
-		// who's left child is a and its right child is b
-		BTNode<Integer, String> parent = new BTNode<Integer, String>(a.getFrequency() + b.getFrequency(),
-				                                                     a.getSymbol() + b.getSymbol(), a, b);
-		/** since the nodes are in a sorted list, we already know that a.frequency <= b.frequency
-		 *	the tie breaker is performed within BTNode.compareTo, where if two nodes have the same frequency
-		 *	we proceed to compare the nodes based on their symbols.
-		 *	@see BTNode.compareTo(BTNode)
+	/**
+	 * Receives a {@code Map} with the frequency distribution and returns the root
+	 * node of the corresponding Huffman tree.
+	 * This method uses a {@code SortedList} to sort the map by the frequency of the
+	 * letters.
+	 * The main idea is in a loop, remove the two first elements of the list, create
+	 * a new node with the sum of the two
+	 * frequencies and add it to the list again, until the list has only one
+	 * element, which is the root node of the tree.
+	 * 
+	 * @author Alejandro A. Perez Pabon
+	 * @param fD Map with the frequency distribution of each character
+	 * @return The root node of the corresponding Huffman tree
+	 * 
+	 */
+	public static BTNode<Integer, String> huffman_tree(Map<String, Integer> fD) {
+
+		BTNode<Integer, String> rootNode = null;
+		SortedLinkedList<BTNode<Integer, String>> fDSortedList = new SortedLinkedList<BTNode<Integer, String>>();
+
+		for (String key : fD.getKeys()) {
+			fDSortedList.add(new BTNode<Integer, String>(fD.get(key), key)); // Adding the letters to the list
+		}
+
+		for (int i = 0; i < fD.size() - 1; i++) {
+			BTNode<Integer, String> leftNode = fDSortedList.removeIndex(0); // Removing the first element
+			BTNode<Integer, String> rightNode = fDSortedList.removeIndex(0); // Removing the second element
+			BTNode<Integer, String> parent = new BTNode<>(leftNode.getKey() + rightNode.getKey(),
+					leftNode.getValue() + rightNode.getValue());
+			parent.setLeftChild(leftNode);
+			parent.setRightChild(rightNode);
+			fDSortedList.add(parent); // Adding the parent node to the list
+		}
+		rootNode = fDSortedList.removeIndex(0); // Removing the root node
+
+		/*
+		 * Use this method to see full Huffman Tree built with the generated root node
+		 * BinaryTreePrinter.print(rootNode);
 		 */
-		
-		sortedList.add(parent); // add parent node to continue building tree
+		BinaryTreePrinter.print(rootNode); // Dummy print
+		return rootNode;
 	}
-	
-	return sortedList.removeIndex(0); // there is only one node left in our list, this is the root node of the tree
-}
 ```
 Once we've created the Huffman Tree, we can proceed to the creation of the Huffman Code Table. We start
 traversing the tree from the root until we reach a leaf, the path taken to reach the leaf is that leaf's 
