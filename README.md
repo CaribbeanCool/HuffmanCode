@@ -1,4 +1,4 @@
-## Data Structures Project 2 - Huffman Coding
+# Data Structures Project 2 - Huffman Coding
 
 *Huffman Coding* is an encoding algorithm for lossless data compression developed by
 David A. Huffman in 1952. The compression works by replacing characters which take 8 bits,
